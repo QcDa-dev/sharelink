@@ -36,7 +36,7 @@
         .message { margin-bottom: 20px; padding: 10px; border-radius: 8px; font-weight: 500; }
         .message.error { background-color: #fee2e2; color: #dc2626; }
         .message.success { background-color: #d1fae5; color: #059669; }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; display: none; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; } /* Initially visible */
         .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #4f46e5; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 1001; }
@@ -52,8 +52,7 @@
         .change .bar1 { transform: rotate(-45deg) translate(-6px, 6px); }
         .change .bar2 { opacity: 0; }
         .change .bar3 { transform: rotate(45deg) translate(-6px, -6px); }
-        [data-page] { display: none; }
-        [data-page="Login"] { display: block; }
+        [data-page] { display: none; } /* All pages hidden by default */
         
         /* Styles for Explain Page */
         .explain-content-wrapper { max-width: 800px; margin: 20px auto; padding: 0 10px 2em 10px; }
@@ -87,7 +86,7 @@
             <a href="javascript:void(0)" id="contactLink">お問い合わせ</a>
             <a href="javascript:void(0)" id="releaseNotes">リリースノート</a>
             <a href="javascript:void(0)" id="logoutBtn">ログアウト</a>
-            <div class="version-info">ver 2.3.0</div>
+            <div class="version-info">ver 2.4.0</div>
         </div>
         <div id="menuOverlay"></div>
 
@@ -101,7 +100,7 @@
                     <p class="text-gray-500">ドキュメントを読み込み中...</p>
                 </div>
                 <div class="flex justify-center mt-6">
-                    <button id="addInfoBtn" class="btn btn-primary w-full sm:w-1/2">情報を追加</button>
+                    <button id="addInfoBtn" class="btn btn-primary w-full sm:w-128">情報を追加</button>
                 </div>
             </div>
         </div>
@@ -149,7 +148,7 @@
                 <section><h2>匿名性と注意点</h2><ul><li>投稿にはユーザーIDが表示されます。（氏名は非表示）</li><li>不適切・虚偽の投稿は禁止とし、運営により削除される場合があります。</li></ul></section>
                 <section><h2>お問い合わせについて</h2><p>ログインや企業情報の閲覧・投稿・修正など、アプリに関するお困りごとは、<br>画面右上の三本線をクリックし、「お問い合わせ」フォームからお願いします！</p></section>
                 <div class="flex justify-center mt-6">
-                    <button id="explainBackBtn" class="btn btn-secondary w-full sm:w-1/2">戻る</button>
+                    <button id="explainBackBtn" class="btn btn-secondary w-full sm:w-128">戻る</button>
                 </div>
             </div>
         </div>
@@ -157,7 +156,7 @@
     </div>
 
     <!-- Login Page -->
-    <div data-page="Login">
+    <div data-page="Login" style="display: none;"> <!-- Initially hidden -->
         <div class="container">
             <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">ログイン</h2>
@@ -198,42 +197,47 @@
         const auth = firebase.auth();
 
         // ▼▼▼ 修正箇所 ▼▼▼
-        // ログインリダイレクトからの復帰を処理する
-        auth.getRedirectResult()
-            .then((result) => {
-                if (result.user) {
-                    console.log("Signed in via redirect:", result.user.email);
-                    // ログイン成功後、UIの更新はonAuthStateChangedに任せる
-                }
-            }).catch((error) => {
-                // ここでリダイレクト後のエラーをハンドル
-                console.error("Redirect Error:", error);
-                showMessage(document.getElementById('loginMessage'), `ログインエラー: ${error.message}`, 'error');
-            });
+        // 認証フロー全体を堅牢化
+        const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
+        const hideLoading = () => document.getElementById('loadingOverlay').style.display = 'none';
 
-
+        // 認証状態の監視を開始
         auth.onAuthStateChanged(user => {
+            hideLoading(); // 認証状態が確定したら、まずローディングを非表示にする
             if (user) {
+                // ログイン済みの場合
                 document.querySelector('[data-page="Login"]').style.display = 'none';
                 document.getElementById('appBody').style.display = 'block';
-                navigateTo('ListDisplay');
+                navigateTo('ListDisplay'); // 企業一覧ページへ
             } else {
-                document.querySelector('[data-page="Login"]').style.display = 'block';
+                // 未ログインの場合
                 document.getElementById('appBody').style.display = 'none';
+                document.querySelector('[data-page="Login"]').style.display = 'block';
             }
         });
 
-        // Event Listeners
+        // ログインボタンのイベントリスナー
         document.getElementById('googleLoginBtn').addEventListener('click', () => {
+            showLoading(); // ログイン処理中はローディングを表示
             const provider = new firebase.auth.GoogleAuthProvider();
-            // ▼▼▼ 修正箇所 ▼▼▼
-            // ポップアップではなくリダイレクト方式でログインする
             auth.signInWithRedirect(provider);
         });
 
+        // ログアウトボタンのイベントリスナー
         document.getElementById('logoutBtn').addEventListener('click', () => {
+            showLoading();
             auth.signOut();
         });
+
+        // リダイレクトからの復帰を処理
+        auth.getRedirectResult().catch(error => {
+            hideLoading();
+            console.error("Redirect Result Error:", error);
+            showMessage(document.getElementById('loginMessage'), `ログインエラー: ${error.message}`, 'error');
+            document.querySelector('[data-page="Login"]').style.display = 'block';
+            document.getElementById('appBody').style.display = 'none';
+        });
+
     });
 
     /**
@@ -248,8 +252,6 @@
             return Promise.reject(new Error("User not authenticated."));
         }
         
-        // Safariのセキュリティ機能との互換性のため、トークンの強制更新(true)を削除。
-        // キャッシュされた有効なトークンを使用することで、安定性を向上させます。
         const idToken = await user.getIdToken();
         
         return new Promise((resolve, reject) => {
@@ -282,26 +284,28 @@
             script.src = `${GAS_WEB_APP_URL}?${params.toString()}`;
             document.head.appendChild(script);
 
-            // Timeout for the request
             setTimeout(() => {
-                if (window[callbackName]) { // if callback still exists, it means timeout
+                if (window[callbackName]) {
                     delete window[callbackName];
                     document.head.removeChild(script);
                     reject(new Error('Request timed out.'));
                 }
-            }, 15000); // 15 seconds timeout
+            }, 15000); 
         });
     }
 
     // --- Page Navigation and Initialization ---
-    let currentPage = 'Login';
+    let currentPage = null;
 
     function navigateTo(page, loadData = true) {
         if(currentPage && document.querySelector(`[data-page="${currentPage}"]`)) {
             document.querySelector(`[data-page="${currentPage}"]`).style.display = 'none';
         }
-        document.querySelector(`[data-page="${page}"]`).style.display = 'block';
-        currentPage = page;
+        const newPageElement = document.querySelector(`[data-page="${page}"]`);
+        if (newPageElement) {
+            newPageElement.style.display = 'block';
+            currentPage = page;
+        }
 
         if (loadData) {
             if (page === 'ListDisplay') {
@@ -313,9 +317,7 @@
     }
     
     // --- Common UI Functions ---
-    const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
-    const hideLoading = () => document.getElementById('loadingOverlay').style.display = 'none';
-
+    // Note: showLoading/hideLoading are now inside DOMContentLoaded for better control
     function showMessage(element, message, type) {
         if (!element) return;
         element.textContent = message;
@@ -330,6 +332,8 @@
 
     // --- ListDisplay Page Logic ---
     async function fetchDocumentContent() {
+        const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
+        const hideLoading = () => document.getElementById('loadingOverlay').style.display = 'none';
         showLoading();
         try {
             const response = await callGasApi('getGoogleDocContent', [DOC_ID_FOR_LIST]);
@@ -343,6 +347,8 @@
     }
 
     async function fetchPopupContent(linkedDocId) {
+        const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
+        const hideLoading = () => document.getElementById('loadingOverlay').style.display = 'none';
         showLoading();
         try {
             const response = await callGasApi('getGoogleDocContent', [linkedDocId]);
@@ -434,6 +440,7 @@
 
     // --- RecordEntry Page Logic ---
     function loadRecordEntryData() {
+        const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
         document.getElementById('recordForm').reset();
         populateDropdown(document.getElementById('companySelect'), []);
         fetchTagsForExisting();
@@ -441,6 +448,8 @@
     }
     
     async function fetchTagsForExisting() {
+        const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
+        const hideLoading = () => document.getElementById('loadingOverlay').style.display = 'none';
         showLoading();
         try {
             const tags = await callGasApi('getTags');
@@ -464,6 +473,8 @@
     }
 
     async function fetchCompaniesByIndustry(industryName) {
+        const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
+        const hideLoading = () => document.getElementById('loadingOverlay').style.display = 'none';
         if (industryName === '----') {
             populateDropdown(document.getElementById('companySelect'), []);
             return;
@@ -517,6 +528,8 @@
         document.getElementById('recordBackBtn').addEventListener('click', () => navigateTo('ListDisplay'));
         document.getElementById('industrySelect').addEventListener('change', (e) => fetchCompaniesByIndustry(e.target.value));
         document.getElementById('submitBtn').addEventListener('click', async () => {
+            const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
+            const hideLoading = () => document.getElementById('loadingOverlay').style.display = 'none';
             showLoading();
             const recordForm = document.getElementById('recordForm');
             const user = firebase.auth().currentUser;
