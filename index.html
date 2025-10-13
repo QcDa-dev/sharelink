@@ -87,7 +87,7 @@
             <a href="javascript:void(0)" id="contactLink">お問い合わせ</a>
             <a href="javascript:void(0)" id="releaseNotes">リリースノート</a>
             <a href="javascript:void(0)" id="logoutBtn">ログアウト</a>
-            <div class="version-info">ver 2.2.0</div>
+            <div class="version-info">ver 2.3.0</div>
         </div>
         <div id="menuOverlay"></div>
 
@@ -197,12 +197,25 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
+        // ▼▼▼ 修正箇所 ▼▼▼
+        // ログインリダイレクトからの復帰を処理する
+        auth.getRedirectResult()
+            .then((result) => {
+                if (result.user) {
+                    console.log("Signed in via redirect:", result.user.email);
+                    // ログイン成功後、UIの更新はonAuthStateChangedに任せる
+                }
+            }).catch((error) => {
+                // ここでリダイレクト後のエラーをハンドル
+                console.error("Redirect Error:", error);
+                showMessage(document.getElementById('loginMessage'), `ログインエラー: ${error.message}`, 'error');
+            });
+
+
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.querySelector('[data-page="Login"]').style.display = 'none';
                 document.getElementById('appBody').style.display = 'block';
-                // ▼▼▼ 修正箇所 ▼▼▼
-                // ログイン後、企業一覧画面を表示し、データを読み込む
                 navigateTo('ListDisplay');
             } else {
                 document.querySelector('[data-page="Login"]').style.display = 'block';
@@ -213,9 +226,9 @@
         // Event Listeners
         document.getElementById('googleLoginBtn').addEventListener('click', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch(error => {
-                showMessage(document.getElementById('loginMessage'), `ログインエラー: ${error.message}`, 'error');
-            });
+            // ▼▼▼ 修正箇所 ▼▼▼
+            // ポップアップではなくリダイレクト方式でログインする
+            auth.signInWithRedirect(provider);
         });
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -235,7 +248,6 @@
             return Promise.reject(new Error("User not authenticated."));
         }
         
-        // ▼▼▼ 修正箇所 ▼▼▼
         // Safariのセキュリティ機能との互換性のため、トークンの強制更新(true)を削除。
         // キャッシュされた有効なトークンを使用することで、安定性を向上させます。
         const idToken = await user.getIdToken();
