@@ -1,180 +1,140 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>就活しぇありんく</title>
-
-    <!-- Tailwind CSS and Fonts -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-    <!-- Common CSS -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f9f9f9;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 100vh;
-        padding: 20px;
-        position: relative;
-      }
-      .container {
-        background-color: #ffffff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 500px; /* Default max-width */
-        text-align: center;
-        display: none; /* Initially hide all containers */
-      }
-      .container.active {
-        display: block; /* Show active container */
-      }
-      .container.max-w-2xl { max-width: 768px; }
-      .container.max-w-3xl { max-width: 896px; }
-      .logo {
-        margin-bottom: 20px;
-        width: 200px;
-        height: auto;
-        max-width: 100%;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-      }
-      .form-group { margin-bottom: 15px; text-align: left; }
-      .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
-      .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #4b5563; }
-      .btn { padding: 12px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background-color 0.3s ease; width: 100%; margin-top: 10px; }
-      .btn-primary { background-color: #4f46e5; color: white; border: none; }
-      .btn-primary:hover { background-color: #4338ca; }
-      .btn-secondary { background-color: #e5e7eb; color: #374151; border: 1px solid #d1d5db; }
-      .btn-secondary:hover { background-color: #d1d5db; }
-      .message { margin-bottom: 20px; padding: 10px; border-radius: 8px; font-weight: 500; }
-      .message.error { background-color: #fee2e2; color: #dc2626; }
-      .message.success { background-color: #d1fae5; color: #059669; }
-      .hidden { display: none; }
-      .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; display: none; }
-      .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #4f46e5; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 1001; }
-      .popup-content { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2); max-width: 80%; max-height: 80%; overflow-y: auto; position: relative; }
-      .popup-close-btn { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-      #hamburger-icon { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; justify-content: space-around; width: 30px; height: 25px; cursor: pointer; z-index: 1003; }
-      #hamburger-icon div { width: 100%; height: 3px; background-color: #374151; border-radius: 2px; transition: all 0.3s ease-in-out; }
-      .sidenav { height: 100%; width: 0; position: fixed; z-index: 1002; top: 0; right: 0; background-color: #ffffff; overflow-x: hidden; transition: 0.5s; padding-top: 60px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
-      .sidenav a { padding: 10px 15px 10px 32px; text-decoration: none; font-size: 18px; color: #374151; display: block; transition: 0.3s; }
-      .sidenav a:hover { background-color: #f3f4f6; }
-      .sidenav .version-info { position: absolute; bottom: 20px; padding-left: 32px; font-size: 14px; color: #9ca3af; }
-      #menuOverlay { position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 1001; cursor: pointer; }
-      .change .bar1 { transform: rotate(-45deg) translate(-6px, 6px); }
-      .change .bar2 { opacity: 0; }
-      .change .bar3 { transform: rotate(45deg) translate(-6px, -6px); }
-      @media screen and (max-width: 640px) {
-        body { padding: 10px; }
-        .container { padding: 20px; }
-        h2, .text-2xl { font-size: 1.25rem; }
-        .btn { padding: 12px 15px; font-size: 1rem; }
-        .form-input { padding: 12px; font-size: 1rem; }
-        .logo { width: 200px; }
-      }
-      .explain-content { max-width: 800px; margin: 0 auto; padding-bottom: 2em; }
-      .explain-content h1, .explain-content h2 { color: #007ACC; }
-      .explain-content dt { color: #007ACC; font-weight: bold; }
-      .explain-content section { font-family: 'Segoe UI', sans-serif; color: #333; margin-bottom: 2em; background-color: #fff; padding: 1em 1.5em; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-      .explain-content ul { padding-left: 1.5em; }
+        body {
+            font-family: 'Inter', sans-serif; background-color: #f9f9f9; display: flex;
+            justify-content: center; align-items: flex-start; min-height: 100vh; padding: 20px; position: relative;
+        }
+        .container {
+            background-color: #ffffff; padding: 30px; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 100%;
+            max-width: 500px; text-align: center;
+        }
+        .container.max-w-2xl { max-width: 768px; }
+        .container.max-w-3xl { max-width: 896px; }
+        .logo { margin-bottom: 20px; width: 200px; height: auto; max-width: 100%; display: block; margin-left: auto; margin-right: auto; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #4b5563; }
+        .btn { padding: 12px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background-color 0.3s ease; width: 100%; margin-top: 10px; }
+        .btn-primary { background-color: #4f46e5; color: white; border: none; }
+        .btn-primary:hover { background-color: #4338ca; }
+        .btn-secondary { background-color: #e5e7eb; color: #374151; border: 1px solid #d1d5db; }
+        .btn-secondary:hover { background-color: #d1d5db; }
+        .message { margin-bottom: 20px; padding: 10px; border-radius: 8px; font-weight: 500; }
+        .message.error { background-color: #fee2e2; color: #dc2626; }
+        .message.success { background-color: #d1fae5; color: #059669; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; display: none; }
+        .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #4f46e5; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 1001; }
+        .popup-content { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2); max-width: 80%; max-height: 80%; overflow-y: auto; position: relative; }
+        .popup-close-btn { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        #hamburger-icon { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; justify-content: space-around; width: 30px; height: 25px; cursor: pointer; z-index: 1003; }
+        #hamburger-icon div { width: 100%; height: 3px; background-color: #374151; border-radius: 2px; transition: all 0.3s ease-in-out; }
+        .sidenav { height: 100%; width: 0; position: fixed; z-index: 1002; top: 0; right: 0; background-color: #ffffff; overflow-x: hidden; transition: 0.5s; padding-top: 60px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+        .sidenav a { padding: 10px 15px 10px 32px; text-decoration: none; font-size: 18px; color: #374151; display: block; transition: 0.3s; }
+        .sidenav a:hover { background-color: #f3f4f6; }
+        .sidenav .version-info { position: absolute; bottom: 20px; padding-left: 32px; font-size: 14px; color: #9ca3af; }
+        #menuOverlay { position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 1001; cursor: pointer; }
+        .change .bar1 { transform: rotate(-45deg) translate(-6px, 6px); }
+        .change .bar2 { opacity: 0; }
+        .change .bar3 { transform: rotate(45deg) translate(-6px, -6px); }
+        [data-page] { display: none; }
+        [data-page="Login"] { display: block; }
+        @media screen and (max-width: 640px) {
+            body { padding: 10px; }
+            .container { padding: 20px; }
+            h2, .text-2xl { font-size: 1.25rem; }
+            .btn { padding: 12px 15px; font-size: 1rem; }
+            .form-input { padding: 12px; font-size: 1rem; }
+            .logo { width: 200px; }
+        }
     </style>
 </head>
 <body>
-    <!-- Menu -->
-    <div id="hamburger-icon">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-    </div>
-    <div id="sideMenu" class="sidenav">
-        <a href="javascript:void(0)" id="manualLink">使い方ガイド</a>
-        <a href="javascript:void(0)" id="contactLink">お問い合わせ</a>
-        <a href="javascript:void(0)" id="releaseNotes">リリースノート</a>
-        <a href="javascript:void(0)" id="logoutBtn" class="hidden">ログアウト</a>
-        <div class="version-info">ver 2.0.0</div>
-    </div>
-    <div id="menuOverlay"></div>
+    <!-- App Body -->
+    <div id="appBody" style="display: none;">
+        <!-- Menu -->
+        <div id="hamburger-icon">
+            <div class="bar1"></div><div class="bar2"></div><div class="bar3"></div>
+        </div>
+        <div id="sideMenu" class="sidenav">
+            <a href="javascript:void(0)" id="manualLink">使い方ガイド</a>
+            <a href="javascript:void(0)" id="contactLink">お問い合わせ</a>
+            <a href="javascript:void(0)" id="releaseNotes">リリースノート</a>
+            <a href="javascript:void(0)" id="logoutBtn">ログアウト</a>
+            <div class="version-info">ver 2.0.0</div>
+        </div>
+        <div id="menuOverlay"></div>
 
-    <!-- Loading Spinner -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
+        <!-- Page: ListDisplay -->
+        <div data-page="ListDisplay">
+            <div class="container max-w-3xl">
+                <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">企業情報一覧</h2>
+                <div id="listMessage" class="message hidden"></div>
+                <div id="documentContent" class="text-left p-4 border border-gray-200 rounded-lg bg-gray-50 overflow-y-auto max-h-[60vh]">
+                    <p class="text-gray-500">ドキュメントを読み込み中...</p>
+                </div>
+                <div class="flex justify-center mt-6">
+                    <button id="addInfoBtn" class="btn btn-primary w-full sm:w-1/2">情報を追加</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page: RecordEntry -->
+        <div data-page="RecordEntry">
+            <div class="container max-w-2xl">
+                <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">情報記録</h2>
+                <p>日時やイベント名などがわかるときは、タイトルに必ず書くようにしてください！<br><br></p>
+                <div id="recordMessage" class="message hidden"></div>
+                <form id="recordForm">
+                    <div class="form-group"><label for="industrySelect">業界</label><select name="industryName" id="industrySelect" class="form-input"><option value="----">----</option></select></div>
+                    <div class="form-group"><label for="companySelect">企業名</label><select name="companyName" id="companySelect" class="form-input"><option value="----">----</option></select></div>
+                    <div class="mt-8 p-4 border border-blue-200 rounded-lg bg-blue-50">
+                        <p class="text-blue-700 mb-2 text-sm">新しい企業を登録したい場合は、こちらに企業名を正確に記入してください。<br>また、業界を選択してください。</p>
+                        <div class="form-group"><label for="newIndustrySelect">業界</label><select name="newIndustryName" id="newIndustrySelect" class="form-input"><option value="----">----</option></select></div>
+                        <div class="form-group"><label for="newCompanyName">企業名</label><input type="text" name="newCompanyName" id="newCompanyName" placeholder="新しい企業名を入力" class="form-input"></div>
+                        <p class="text-gray-600 text-sm mt-2">業界の分類については、<a href="https://shinsotsu.mynavi-agent.jp/knowhow/article/industry-list/" target="_blank" class="text-blue-600 hover:underline">マイナビの分類</a>を参照してください。</p>
+                    </div>
+                    <div class="form-group mt-6"><label for="title">タイトル</label><input type="text" name="title" id="title" placeholder="タイトルを入力" class="form-input" required></div>
+                    <div class="form-group"><label for="contents">内容</label><textarea name="contents" id="contents" rows="10" placeholder="内容を入力" class="form-input"></textarea></div>
+                    <div class="flex justify-between mt-6 space-x-4">
+                        <button type="button" id="backBtn" class="btn btn-secondary w-1/2">戻る</button>
+                        <button type="button" id="submitBtn" class="btn btn-primary">情報の追加</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Login Page -->
-    <div id="login-page" class="container">
-        <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">ログイン</h2>
-        <p class="mb-4">Googleアカウントでログインしてください。</p>
-        <div id="login-message" class="message hidden"></div>
-        <button id="googleLoginBtn" class="btn btn-primary">Googleアカウントでログイン</button>
-    </div>
-
-    <!-- List Display Page -->
-    <div id="list-page" class="container max-w-3xl">
-        <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">企業情報一覧</h2>
-        <div id="list-message" class="message hidden"></div>
-        <div id="documentContent" class="text-left p-4 border border-gray-200 rounded-lg bg-gray-50 overflow-y-auto max-h-[60vh]">
-            <p class="text-gray-500">ドキュメントを読み込み中...</p>
-        </div>
-        <div class="flex justify-center mt-6">
-            <button id="addInfoBtn" class="btn btn-primary w-full sm:w-1/2">情報を追加</button>
-        </div>
-    </div>
-    
-    <!-- Record Entry Page -->
-    <div id="record-page" class="container max-w-2xl">
-        <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">情報記録</h2>
-        <p>日時やイベント名などがわかるときは、タイトルに必ず書くようにしてください！<br><br></p>
-        <div id="record-message" class="message hidden"></div>
-        <form id="recordForm">
-            <div class="form-group"><label for="industrySelect">業界</label><select name="industryName" id="industrySelect" class="form-input"><option value="----">----</option></select></div>
-            <div class="form-group"><label for="companySelect">企業名</label><select name="companyName" id="companySelect" class="form-input"><option value="----">----</option></select></div>
-            <div class="mt-8 p-4 border border-blue-200 rounded-lg bg-blue-50">
-                <p class="text-blue-700 mb-2 text-sm">新しい企業を登録したい場合は、こちらに企業名を正確に記入してください。<br>また、業界を選択してください。</p>
-                <div class="form-group"><label for="newIndustrySelect">業界</label><select name="newIndustryName" id="newIndustrySelect" class="form-input"><option value="----">----</option></select></div>
-                <div class="form-group"><label for="newCompanyName">企業名</label><input type="text" name="newCompanyName" id="newCompanyName" placeholder="新しい企業名を入力" class="form-input"></div>
-                <p class="text-gray-600 text-sm mt-2">業界の分類については、<a href="https://shinsotsu.mynavi-agent.jp/knowhow/article/industry-list/" target="_blank" class="text-blue-600 hover:underline">マイナビの分類</a>を参照してください。</p>
-            </div>
-            <div class="form-group mt-6"><label for="title">タイトル</label><input type="text" name="title" id="title" placeholder="タイトルを入力" class="form-input" required></div>
-            <div class="form-group"><label for="contents">内容</label><textarea name="contents" id="contents" rows="10" placeholder="内容を入力" class="form-input"></textarea></div>
-            <div class="flex justify-between mt-6 space-x-4">
-                <button type="button" id="recordBackBtn" class="btn btn-secondary w-1/2">戻る</button>
-                <button type="button" id="submitBtn" class="btn btn-primary">情報の追加</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Explain Page -->
-    <div id="explain-page" class="container max-w-3xl">
-        <div class="explain-content">
-            <!-- Explain.html content goes here -->
-            <div class="text-right mb-4"><button id="explainBackBtn" class="btn btn-secondary w-auto">戻る</button></div>
-            <h1>使い方ガイド</h1>
-            <section><h2>アプリ概要</h2><p>「就活しぇありんく」は、学生同士で就職活動・企業情報を共有できるWebアプリです。<br>インターンや説明会の体験談などを投稿・閲覧し、効率的に企業研究や就職活動を進められます！<br>スマホでも問題なく使用できますが、PCでの使用をお勧めします。</p></section>
-            <section><h2>こんな人におすすめ！</h2><ul><li>とにかく色んな企業の情報を見てみたい人</li><li>他の学生のリアルな就活情報を知りたい人</li><li>情報収集を効率よく進めたい人</li><li>学内に情報が少ないと感じている人</li></ul></section>
-            <section><h2>企業情報の見方</h2><ul><li>業界ごとに企業一覧が表示されます。</li><li>見たい企業名をクリックすると、各企業の目次ページに飛びます。</li><li>目次ページの中から見たい情報をクリックし、閲覧してください。</li><li>企業の情報を追加したいときは、”情報の追加”ボタンをクリック！</li></ul></section>
-            <section><h2>情報の追加</h2><p>皆さんが持っている情報をどしどし投稿してください！<br>情報の追加には、ログインが必要です。</p> <dl><dt>＜既にしぇありんくに登録されている企業の場合＞</dt><dd><ul><li type="1">業界と企業名を選んでください</li><li type="1">タイトルと、内容を入力してください<br>（日時やイベント名などがわかるときは、タイトルに必ず書くようにしてください）</li><li type="1">最後に、”情報の追加”ボタンをクリック！</li></ul></dd><dt><br>＜新しい企業の場合＞</dt><dd><ul><li type="1">業界を選んでください</li><li type="1">企業名を正確に入力してください</li><li type="1">タイトルと内容を入力してください<br>（日時やイベント名などがわかるときは、タイトルに必ず書くようにしてください）</li><li type="1">最後に、”情報の追加”ボタンをクリック！</li></ul></dd><dt><br>＜注意点＞</dt><dd><ul><li>業界については、<a href="https://shinsotsu.mynavi-agent.jp/knowhow/article/industry-list/" target="_blank" class="text-blue-500 hover:underline">マイナビの分類</a>を参照してください。</li><li>現在、PDFなどのファイルのアップロードには対応していません。<br>今後のアップデートで対応していく予定です。</li><li>PDFなどを内容に含めたい場合には、ファイルを一度Googleドライブなどオンラインストレージサービスにアップロードしていただき、共有用URLを貼り付ける形でお願いします。</li><li>投稿済み情報の修正・更新依頼は、「お問い合わせ」からお願いします！</li></ul></dd></dl></section>
-            <section><h2>お問い合わせについて</h2><p>ログインや企業情報の閲覧・投稿・修正など、アプリに関するお困りごとは、<br>画面右上の三本線をクリックし、「お問い合わせ」フォームからお願いします！</p></section>
+    <div data-page="Login">
+        <div class="container">
+            <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">ログイン</h2>
+            <p>利用にはGoogleアカウントでの認証が必要です。</p>
+            <div id="loginMessage" class="message hidden"></div>
+            <button id="googleLoginBtn" class="btn btn-primary">Googleアカウントでログイン</button>
         </div>
     </div>
 
-    <!-- Popup Overlay -->
+    <!-- Loading & Popups -->
+    <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
     <div class="popup-overlay" id="popupOverlay">
         <div class="popup-content">
             <button class="popup-close-btn" id="popupCloseBtn">×</button>
@@ -182,363 +142,355 @@
             <div id="popupContentBody" class="text-left max-h-[50vh] overflow-y-auto"></div>
         </div>
     </div>
-    
-    <script>
-        // ========================================================================
-        // CONFIGURATION
-        // ========================================================================
-        // ▼▼▼【重要】作業手順書に従って、以下の２つの値を設定してください ▼▼▼
-        const firebaseConfig = {
-            // ここにFirebaseプロジェクトの構成オブジェクトを貼り付けます
-            apiKey: "AIzaSyCLFF_G7J0jcZ5UOXkKaaI4dzYWGQYwfMk",
-            authDomain: "share-link-app-7c054.firebaseapp.com",
-            projectId: "share-link-app-7c054",
-            storageBucket: "share-link-app-7c054.firebasestorage.app",
-            messagingSenderId: "798642318617",
-            appId: "1:798642318617:web:fb6a11384f56a93d6ae988"
-        };
-        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxK1vKRm9D-oWlkOkmLsrEeNf9vse6R6qmQpE_TJpsTWZjHepBX6yheNQ3t-CMGT4sG/exec';
-        // ▲▲▲【重要】作業手順書に従って、上記２つの値を設定してください ▲▲▲
 
-        // ========================================================================
-        // GLOBAL VARIABLES
-        // ========================================================================
-        let currentUser = null;
+<script>
+    // ▼▼▼【重要】作業手順書に従って、Firebaseの情報を設定してください ▼▼▼
+    const firebaseConfig = {
+        apiKey: "AIzaSyCLFF_G7J0jcZ5UOXkKaaI4dzYWGQYwfMk",
+        authDomain: "share-link-app-7c054.firebaseapp.com",
+        projectId: "share-link-app-7c054",
+        storageBucket: "share-link-app-7c054.firebasestorage.app",
+        messagingSenderId: "798642318617",
+        appId: "1:798642318617:web:fb6a11384f56a93d6ae988"
+    };
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxK1vKRm9D-oWlkOkmLsrEeNf9vse6R6qmQpE_TJpsTWZjHepBX6yheNQ3t-CMGT4sG/exec';
+    const DOC_ID_FOR_LIST = '1GFx3yl_M6ljmZhgBTS5PGhOtYpe_Umwl9myEfLNHMyo';
+    // ▲▲▲【重要】作業手順書に従って、Firebaseの情報を設定してください ▲▲▲
 
-        // ========================================================================
-        // INITIALIZATION
-        // ========================================================================
+    // --- Core App Logic ---
+    document.addEventListener('DOMContentLoaded', () => {
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        document.addEventListener('DOMContentLoaded', () => {
-            initAuth();
-            initMenu();
-            initLoginPage();
-            initListPage();
-            initRecordPage();
-            initExplainPage();
-            initPopup();
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.querySelector('[data-page="Login"]').style.display = 'none';
+                document.getElementById('appBody').style.display = 'block';
+                loadInitialData();
+            } else {
+                document.querySelector('[data-page="Login"]').style.display = 'block';
+                document.getElementById('appBody').style.display = 'none';
+            }
         });
 
-        // ========================================================================
-        // UTILITY FUNCTIONS
-        // ========================================================================
-        function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
-        function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
-
-        function showPage(pageId) {
-            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-        }
-
-        function showMessage(elementId, message, type) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-            element.textContent = message;
-            element.className = 'message';
-            element.classList.add(type);
-            setTimeout(() => { element.classList.add('hidden'); }, 5000);
-        }
-
-        async function callGasApi(functionName, parameters) {
-            showLoading();
-            if (!currentUser) {
-                showMessage('login-message', '認証エラー。再度ログインしてください。', 'error');
-                hideLoading();
-                auth.signOut();
-                return;
-            }
-
-            try {
-                const idToken = await currentUser.getIdToken(true);
-                const response = await fetch(GAS_WEB_APP_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ functionName, parameters, idToken })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Server error: ${response.statusText}`);
-                }
-                const result = await response.json();
-                hideLoading();
-                return result;
-            } catch (error) {
-                console.error('API Call Error:', error);
-                showMessage('list-message', 'API呼び出し中にエラーが発生しました。', 'error');
-                hideLoading();
-                throw error;
-            }
-        }
-
-        // ========================================================================
-        // AUTHENTICATION
-        // ========================================================================
-        function initAuth() {
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    currentUser = user;
-                    document.getElementById('logoutBtn').classList.remove('hidden');
-                    loadInitialData();
-                } else {
-                    currentUser = null;
-                    document.getElementById('logoutBtn').classList.add('hidden');
-                    showPage('login-page');
-                    hideLoading();
-                }
+        // Event Listeners
+        document.getElementById('googleLoginBtn').addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                showMessage(document.getElementById('loginMessage'), `ログインエラー: ${error.message}`, 'error');
             });
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.signOut();
+        });
+    });
+
+    /**
+     * Calls Google Apps Script API using JSONP method to bypass CORS.
+     * @param {string} functionName - The name of the function to call in GAS.
+     * @param {Array} parameters - An array of parameters for the function.
+     * @returns {Promise<any>} A promise that resolves with the result from the GAS function.
+     */
+    async function callGasApi(functionName, parameters = []) {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            return Promise.reject(new Error("User not authenticated."));
         }
+
+        const idToken = await user.getIdToken(true);
         
-        function loadInitialData() {
-            showPage('list-page');
-            fetchDocumentContent();
-        }
-
-        // ========================================================================
-        // MENU
-        // ========================================================================
-        function initMenu() {
-            const hamburger = document.getElementById('hamburger-icon');
-            const sideMenu = document.getElementById('sideMenu');
-            const menuOverlay = document.getElementById('menuOverlay');
-
-            function toggleMenu() {
-                hamburger.classList.toggle("change");
-                const currentWidth = sideMenu.style.width;
-                sideMenu.style.width = currentWidth === "250px" ? "0" : "250px";
-                menuOverlay.style.display = currentWidth === "250px" ? "none" : "block";
-            }
-
-            hamburger.addEventListener('click', toggleMenu);
-            menuOverlay.addEventListener('click', toggleMenu);
-
-            document.getElementById('manualLink').addEventListener('click', () => { showPage('explain-page'); toggleMenu(); });
-            document.getElementById('contactLink').addEventListener('click', () => { window.open('https://docs.google.com/forms/d/e/1FAIpQLScGBvXYBi2eNcP7SYKieTLoOYJFnyZ9R5FjCGFhGwfvV2oQqA/viewform?usp=dialog', '_blank'); toggleMenu(); });
-            document.getElementById('releaseNotes').addEventListener('click', () => { window.open('https://dear-mimosa-0c9.notion.site/21de20387ddf8076a938fa17c25257f4?source=copy_link', '_blank'); toggleMenu(); });
-            document.getElementById('logoutBtn').addEventListener('click', () => { auth.signOut(); toggleMenu(); });
-        }
-        
-        // ========================================================================
-        // LOGIN PAGE
-        // ========================================================================
-        function initLoginPage() {
-            document.getElementById('googleLoginBtn').addEventListener('click', () => {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                auth.signInWithPopup(provider).catch(error => {
-                    console.error('Login failed:', error);
-                    showMessage('login-message', `ログインに失敗しました: ${error.message}`, 'error');
-                });
-            });
-        }
-
-        // ========================================================================
-        // LIST DISPLAY PAGE
-        // ========================================================================
-        const DOC_ID_FOR_LIST = '1GFx3yl_M6ljmZhgBTS5PGhOtYpe_Umwl9myEfLNHMyo';
-
-        function initListPage() {
-            document.getElementById('addInfoBtn').addEventListener('click', () => {
-                showPage('record-page');
-                loadRecordEntryData();
-            });
-        }
-
-        async function fetchDocumentContent() {
-            try {
-                const response = await callGasApi('getGoogleDocContent', [DOC_ID_FOR_LIST]);
-                if (response.success) {
-                    renderDocumentContent(JSON.parse(response.content));
-                } else {
-                    showMessage('list-message', response.message, 'error');
-                }
-            } catch (error) {
-                console.error('ドキュメント取得エラー:', error);
-                showMessage('list-message', 'ドキュメントの読み込み中にエラーが発生しました。', 'error');
-            }
-        }
-        
-        function renderDocumentContent(contentElements) {
-            const docContentDiv = document.getElementById('documentContent');
-            docContentDiv.innerHTML = '';
-            // This is a simplified renderer. A more robust solution might be needed for complex docs.
-            contentElements.forEach(element => {
-                if (element.paragraph) {
-                    const p = document.createElement('p');
-                    element.paragraph.elements.forEach(paragraphElement => {
-                        if (paragraphElement.textRun) {
-                            const span = document.createElement('span');
-                            span.textContent = paragraphElement.textRun.content;
-                            if (paragraphElement.textRun.textStyle) {
-                                const style = paragraphElement.textRun.textStyle;
-                                if (style.bold) span.style.fontWeight = 'bold';
-                                if (style.italic) span.style.fontStyle = 'italic';
-                                if (style.underline) span.style.textDecoration = 'underline';
-                                if (style.link) {
-                                    const link = document.createElement('a');
-                                    link.href = style.link.url;
-                                    link.textContent = paragraphElement.textRun.content;
-                                    link.classList.add('text-blue-600', 'hover:underline');
-                                    link.addEventListener('click', (event) => handleDocLinkClick(event, style.link.url));
-                                    p.appendChild(link);
-                                } else {
-                                    p.appendChild(span);
-                                }
-                            } else {
-                                p.appendChild(span);
-                            }
-                        }
-                    });
-                    docContentDiv.appendChild(p);
-                }
-            });
-        }
-        
-        async function handleDocLinkClick(event, url) {
-            event.preventDefault();
-            const match = url.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
-            if (match && match[1]) {
-                const linkedDocId = match[1];
-                try {
-                    const popupResponse = await callGasApi('getGoogleDocContent', [linkedDocId]);
-                    if (popupResponse.success) {
-                        renderPopupContent(JSON.parse(popupResponse.content));
-                        document.getElementById('popupOverlay').style.display = 'flex';
-                    } else {
-                        showMessage('list-message', 'リンク先ドキュメントの読み込みに失敗しました: ' + popupResponse.message, 'error');
-                    }
-                } catch(popupError) {
-                    showMessage('list-message', 'リンク先ドキュメントの読み込み中にエラーが発生しました: ' + popupError.message, 'error');
-                }
-            } else {
-                window.open(url, '_blank');
-            }
-        }
-
-        // ========================================================================
-        // RECORD ENTRY PAGE
-        // ========================================================================
-        function initRecordPage() {
-            document.getElementById('recordBackBtn').addEventListener('click', () => showPage('list-page'));
+        return new Promise((resolve, reject) => {
+            const callbackName = 'gasCallback' + new Date().getTime() + Math.random().toString(36).substr(2, 5);
             
-            document.getElementById('industrySelect').addEventListener('change', function() {
-                fetchCompaniesByIndustry(this.value);
-            });
-
-            document.getElementById('submitBtn').addEventListener('click', async () => {
-                const recordForm = document.getElementById('recordForm');
-                const formData = {
-                    industryName: recordForm.industryName.value,
-                    companyName: recordForm.companyName.value,
-                    newIndustryName: recordForm.newIndustryName.value,
-                    newCompanyName: recordForm.newCompanyName.value,
-                    title: recordForm.title.value,
-                    contents: recordForm.contents.value,
-                    userId: currentUser ? currentUser.email : 'unknown.user', // Use email as user identifier
-                };
-
-                try {
-                    const response = await callGasApi('addRecord', [formData]);
-                    if (response.success) {
-                        showMessage('record-message', response.message, 'success');
-                        recordForm.reset();
-                        populateDropdown(document.getElementById('companySelect'), []);
-                    } else {
-                        showMessage('record-message', response.message, 'error');
-                    }
-                } catch (error) {
-                    console.error('addRecord Failure:', error);
-                    showMessage('record-message', '処理中にエラーが発生しました。', 'error');
+            window[callbackName] = (data) => {
+                delete window[callbackName];
+                document.head.removeChild(script);
+                if (data.success === false) { // Handle server-side errors
+                    reject(new Error(data.message || 'Unknown server error'));
+                } else {
+                    resolve(data);
                 }
+            };
+
+            const script = document.createElement('script');
+            script.onerror = () => {
+                delete window[callbackName];
+                document.head.removeChild(script);
+                reject(new Error('Failed to load data from the server. Check GAS URL and permissions.'));
+            };
+
+            const params = new URLSearchParams({
+                functionName: functionName,
+                parameters: JSON.stringify(parameters),
+                idToken: idToken,
+                callback: callbackName
             });
-        }
+            
+            script.src = `${GAS_WEB_APP_URL}?${params.toString()}`;
+            document.head.appendChild(script);
 
-        function loadRecordEntryData() {
-            fetchTagsForExisting();
-            fetchTagsForNew();
-        }
+            // Timeout for the request
+            setTimeout(() => {
+                if (window[callbackName]) { // if callback still exists, it means timeout
+                    delete window[callbackName];
+                    document.head.removeChild(script);
+                    reject(new Error('Request timed out.'));
+                }
+            }, 15000); // 15 seconds timeout
+        });
+    }
 
-        async function fetchTagsForExisting() {
-            try {
-                const tags = await callGasApi('getTags', []);
-                populateDropdown(document.getElementById('industrySelect'), tags);
-            } catch(e) { console.error('既存業界タグ取得エラー:', e); }
-        }
+    // --- Page Navigation and Initialization ---
+    let currentPage = 'ListDisplay';
 
-        async function fetchTagsForNew() {
-             try {
-                const tags = await callGasApi('getTagsForNewIndustry', []);
-                populateDropdown(document.getElementById('newIndustrySelect'), tags);
-            } catch(e) { console.error('新規業界タグ取得エラー:', e); }
-        }
-        
-        async function fetchCompaniesByIndustry(industryName) {
-            const companySelect = document.getElementById('companySelect');
-            if (industryName === '----') {
-                populateDropdown(companySelect, []);
-                return;
-            }
-            try {
-                const companies = await callGasApi('getCompaniesByIndustry', [industryName]);
-                populateDropdown(companySelect, companies);
-            } catch(e) { console.error('企業名取得エラー:', e); }
-        }
+    function navigateTo(page) {
+        document.querySelector(`[data-page="${currentPage}"]`).style.display = 'none';
+        document.querySelector(`[data-page="${page}"]`).style.display = 'block';
+        currentPage = page;
 
-        function populateDropdown(selectElement, options) {
-            selectElement.innerHTML = '<option value="----">----</option>';
-            if (options && Array.isArray(options)) {
-                options.forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option;
-                    opt.textContent = option;
-                    selectElement.appendChild(opt);
-                });
-            }
+        if (page === 'ListDisplay') {
+            loadInitialData();
+        } else if (page === 'RecordEntry') {
+            loadRecordEntryData();
         }
-        
-        // ========================================================================
-        // EXPLAIN PAGE
-        // ========================================================================
-        function initExplainPage() {
-            document.getElementById('explainBackBtn').addEventListener('click', () => showPage('list-page'));
-        }
+    }
 
-        // ========================================================================
-        // POPUP
-        // ========================================================================
-        function initPopup() {
-            document.getElementById('popupCloseBtn').addEventListener('click', () => {
-                document.getElementById('popupOverlay').style.display = 'none';
-            });
-        }
+    function loadInitialData() {
+        fetchDocumentContent();
+    }
+    
+    // --- Common UI Functions ---
+    const showLoading = () => document.getElementById('loadingOverlay').style.display = 'flex';
+    const hideLoading = () => document.getElementById('loadingOverlay').style.display = 'none';
 
-        function renderPopupContent(contentElements) {
-            const popupContentBody = document.getElementById('popupContentBody');
-            popupContentBody.innerHTML = '';
-            contentElements.forEach(element => {
-                if (element.paragraph) {
-                    const p = document.createElement('p');
-                    element.paragraph.elements.forEach(paragraphElement => {
-                        if (paragraphElement.textRun) {
-                            const span = document.createElement('span');
-                            span.textContent = paragraphElement.textRun.content;
-                            // Apply styles and links as needed, similar to renderDocumentContent
-                            if (paragraphElement.textRun.textStyle && paragraphElement.textRun.textStyle.link) {
-                                const link = document.createElement('a');
-                                link.href = paragraphElement.textRun.textStyle.link.url;
-                                link.textContent = paragraphElement.textRun.content;
-                                link.target = '_blank';
-                                link.classList.add('text-blue-600', 'hover:underline');
-                                p.appendChild(link);
-                            } else {
-                                p.appendChild(span);
-                            }
+    function showMessage(element, message, type) {
+        if (!element) return;
+        element.textContent = message;
+        element.className = 'message';
+        element.classList.add(type, 'block');
+        element.classList.remove('hidden');
+        setTimeout(() => {
+            element.classList.add('hidden');
+            element.classList.remove('block');
+        }, 5000);
+    }
+
+    // --- ListDisplay Page Logic ---
+    async function fetchDocumentContent() {
+        showLoading();
+        try {
+            const response = await callGasApi('getGoogleDocContent', [DOC_ID_FOR_LIST]);
+            renderDocumentContent(JSON.parse(response.content));
+        } catch (error) {
+            console.error('ドキュメント取得エラー:', error);
+            showMessage(document.getElementById('listMessage'), 'ドキュメントの読み込みに失敗しました: ' + error.message, 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    async function fetchPopupContent(linkedDocId) {
+        showLoading();
+        try {
+            const response = await callGasApi('getGoogleDocContent', [linkedDocId]);
+            renderPopupContent(JSON.parse(response.content));
+            document.getElementById('popupOverlay').style.display = 'flex';
+        } catch (error) {
+            console.error('ポップアップ取得エラー:', error);
+            showMessage(document.getElementById('listMessage'), 'リンク先の読み込みに失敗しました: ' + error.message, 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    function renderDocumentContent(contentElements) {
+        const docContentDiv = document.getElementById('documentContent');
+        docContentDiv.innerHTML = '';
+        const industryHeadings = ["官公庁・公社・団体", "メーカー", "商社", "流通・小売", "金融", "サービス・インフラ", "ソフトウェア・通信", "広告・出版・マスコミ"];
+        contentElements.forEach(element => {
+            if (element.paragraph) {
+                let paragraphText = element.paragraph.elements.map(run => run.textRun ? run.textRun.content : '').join('');
+                if (industryHeadings.includes(paragraphText.trim())) {
+                    if (docContentDiv.children.length > 0) docContentDiv.appendChild(document.createElement('br'));
+                }
+                const p = document.createElement('p');
+                element.paragraph.elements.forEach(paragraphElement => {
+                    if (paragraphElement.textRun) {
+                        const textStyle = paragraphElement.textRun.textStyle || {};
+                        let node;
+                        if (textStyle.link) {
+                            node = document.createElement('a');
+                            node.href = textStyle.link.url;
+                            node.textContent = paragraphElement.textRun.content;
+                            node.classList.add('text-blue-600', 'hover:underline');
+                            node.addEventListener('click', function(event) {
+                                event.preventDefault();
+                                const url = this.href;
+                                const match = url.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
+                                if (match && match[1]) {
+                                    fetchPopupContent(match[1]);
+                                } else {
+                                    window.open(url, '_blank');
+                                }
+                            });
+                        } else {
+                            node = document.createElement('span');
+                            node.textContent = paragraphElement.textRun.content;
                         }
-                    });
-                    popupContentBody.appendChild(p);
-                }
+                        if (textStyle.bold) node.style.fontWeight = 'bold';
+                        if (textStyle.italic) node.style.fontStyle = 'italic';
+                        if (textStyle.underline) node.style.textDecoration = 'underline';
+                        if (textStyle.foregroundColor) {
+                            const color = textStyle.foregroundColor.color.rgbColor;
+                            if (color) node.style.color = `rgb(${Math.round(color.red*255)}, ${Math.round(color.green*255)}, ${Math.round(color.blue*255)})`;
+                        }
+                        p.appendChild(node);
+                    }
+                });
+                docContentDiv.appendChild(p);
+            }
+        });
+    }
+
+    function renderPopupContent(contentElements) {
+        const popupContentBody = document.getElementById('popupContentBody');
+        popupContentBody.innerHTML = '';
+        contentElements.forEach(element => {
+            if (element.paragraph) {
+                const p = document.createElement('p');
+                element.paragraph.elements.forEach(paragraphElement => {
+                    if (paragraphElement.textRun) {
+                        const textStyle = paragraphElement.textRun.textStyle || {};
+                        let node = textStyle.link ? document.createElement('a') : document.createElement('span');
+                        node.textContent = paragraphElement.textRun.content;
+                        if (textStyle.link) {
+                            node.href = textStyle.link.url;
+                            node.target = '_blank';
+                            node.classList.add('text-blue-600', 'hover:underline');
+                        }
+                        if (textStyle.bold) node.style.fontWeight = 'bold';
+                        if (textStyle.italic) node.style.fontStyle = 'italic';
+                        if (textStyle.underline) node.style.textDecoration = 'underline';
+                        p.appendChild(node);
+                    }
+                });
+                popupContentBody.appendChild(p);
+            }
+        });
+    }
+
+    // --- RecordEntry Page Logic ---
+    function loadRecordEntryData() {
+        document.getElementById('recordForm').reset();
+        populateDropdown(document.getElementById('companySelect'), []);
+        fetchTagsForExisting();
+        fetchTagsForNew();
+    }
+    
+    async function fetchTagsForExisting() {
+        showLoading();
+        try {
+            const tags = await callGasApi('getTags');
+            populateDropdown(document.getElementById('industrySelect'), tags);
+        } catch (error) {
+            console.error('既存業界タグ取得エラー:', error);
+            showMessage(document.getElementById('recordMessage'), '業界タグの取得に失敗: ' + error.message, 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    async function fetchTagsForNew() {
+        try {
+            const tags = await callGasApi('getTagsForNewIndustry');
+            populateDropdown(document.getElementById('newIndustrySelect'), tags);
+        } catch (error) {
+            console.error('新規業界タグ取得エラー:', error);
+            showMessage(document.getElementById('recordMessage'), '業界タグの取得に失敗: ' + error.message, 'error');
+        }
+    }
+
+    async function fetchCompaniesByIndustry(industryName) {
+        if (industryName === '----') {
+            populateDropdown(document.getElementById('companySelect'), []);
+            return;
+        }
+        showLoading();
+        try {
+            const companies = await callGasApi('getCompaniesByIndustry', [industryName]);
+            populateDropdown(document.getElementById('companySelect'), companies);
+        } catch (error) {
+            console.error('企業名取得エラー:', error);
+            showMessage(document.getElementById('recordMessage'), '企業名の取得に失敗: ' + error.message, 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    function populateDropdown(selectElement, options) {
+        selectElement.innerHTML = '<option value="----">----</option>';
+        if (options && Array.isArray(options)) {
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                selectElement.appendChild(opt);
             });
         }
+    }
 
-    </script>
+    // --- Event Listeners for Dynamic Content ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Menu
+        const hamburger = document.getElementById('hamburger-icon');
+        const sideMenu = document.getElementById('sideMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const toggleMenu = () => {
+            hamburger.classList.toggle("change");
+            sideMenu.style.width = sideMenu.style.width === "250px" ? "0" : "250px";
+            menuOverlay.style.display = menuOverlay.style.display === "block" ? "none" : "block";
+        };
+        hamburger.addEventListener('click', toggleMenu);
+        menuOverlay.addEventListener('click', toggleMenu);
+        document.getElementById('manualLink').addEventListener('click', () => { window.open('https://docs.google.com/document/d/1example/edit', '_blank'); toggleMenu(); });
+        document.getElementById('contactLink').addEventListener('click', () => { window.open('https://docs.google.com/forms/d/e/1FAIpQLScGBvXYBi2eNcP7SYKieTLoOYJFnyZ9R5FjCGFhGwfvV2oQqA/viewform?usp=dialog', '_blank'); toggleMenu(); });
+        document.getElementById('releaseNotes').addEventListener('click', () => { window.open('https://dear-mimosa-0c9.notion.site/21de20387ddf8076a938fa17c25257f4', '_blank'); toggleMenu(); });
+
+        // ListDisplay Page
+        document.getElementById('addInfoBtn').addEventListener('click', () => navigateTo('RecordEntry'));
+        document.getElementById('popupCloseBtn').addEventListener('click', () => document.getElementById('popupOverlay').style.display = 'none');
+        
+        // RecordEntry Page
+        document.getElementById('backBtn').addEventListener('click', () => navigateTo('ListDisplay'));
+        document.getElementById('industrySelect').addEventListener('change', (e) => fetchCompaniesByIndustry(e.target.value));
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            showLoading();
+            const recordForm = document.getElementById('recordForm');
+            const user = firebase.auth().currentUser;
+            const formData = {
+                industryName: recordForm.industryName.value,
+                companyName: recordForm.companyName.value,
+                newIndustryName: recordForm.newIndustryName.value,
+                newCompanyName: recordForm.newCompanyName.value,
+                title: recordForm.title.value,
+                contents: recordForm.contents.value,
+                userId: user ? user.email : 'unknown.user',
+            };
+            try {
+                const response = await callGasApi('addRecord', [formData]);
+                showMessage(document.getElementById('recordMessage'), response.message, 'success');
+                recordForm.reset();
+                populateDropdown(document.getElementById('companySelect'), []);
+            } catch (error) {
+                showMessage(document.getElementById('recordMessage'), `処理中にエラー: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+    });
+
+</script>
 </body>
 </html>
+
