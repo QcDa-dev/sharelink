@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使い方ガイド | 就活しぇありんく</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- ハンバーガーメニューなど共通UI -->
+        <div id="common-ui-container"></div>
+        
+        <!-- メインコンテンツ -->
+        <main class="view-container">
+            <div class="content-card max-w-3xl text-left">
+                <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">使い方ガイド</h1>
+
+                <div class="space-y-8">
+                    <!-- Section 1: 概要 -->
+                    <section>
+                        <h2 class="text-xl font-semibold flex items-center mb-3">
+                            <span class="bg-blue-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-3">1</span>
+                            アプリ概要
+                        </h2>
+                        <div class="pl-11 text-gray-700">
+                            <p>「就活しぇありんく」は、学生同士で就職活動の情報を共有するためのWebアプリケーションです。<br>インターンシップや説明会の体験談、選考情報などを投稿・閲覧し、みんなで協力して効率的に企業研究を進めることを目的としています。</p>
+                        </div>
+                    </section>
+
+                    <!-- Section 2: ログイン -->
+                    <section>
+                        <h2 class="text-xl font-semibold flex items-center mb-3">
+                            <span class="bg-blue-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-3">2</span>
+                            ログインとアクセス権
+                        </h2>
+                        <div class="pl-11 text-gray-700 space-y-2">
+                            <p>このアプリは、<strong class="text-red-600">事前に登録された特定のGoogleアカウント</strong>でのみ利用可能です。</p>
+                            <ul class="list-disc pl-5">
+                                <li>ログイン画面で「Googleアカウントでログイン」ボタンをクリックしてください。</li>
+                                <li>許可されたアカウントでログインすると、企業情報一覧ページに移動します。</li>
+                                <li>許可されていないアカウントでログインしようとすると、エラーメッセージが表示されます。</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Section 3: 情報の閲覧 -->
+                    <section>
+                        <h2 class="text-xl font-semibold flex items-center mb-3">
+                            <span class="bg-blue-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-3">3</span>
+                            情報の閲覧方法
+                        </h2>
+                        <div class="pl-11 text-gray-700 space-y-2">
+                            <p>ログインすると、投稿されている企業が業界別に一覧表示されます。</p>
+                            <ul class="list-disc pl-5">
+                                <li>関心のある企業名をクリックすると、その企業に関する投稿がポップアップで表示されます。</li>
+                                <li>ポップアップ内の投稿は、新しいものが上に表示されます。</li>
+                                <li>ポップアップ右上の「×」ボタンで閉じることができます。</li>
+                            </ul>
+                        </div>
+                    </section>
+                    
+                    <!-- Section 4: 情報の追加 -->
+                    <section>
+                        <h2 class="text-xl font-semibold flex items-center mb-3">
+                            <span class="bg-blue-500 text-white rounded-full h-8 w-8 flex items-center justify-center mr-3">4</span>
+                            情報の追加方法
+                        </h2>
+                        <div class="pl-11 text-gray-700">
+                            <p class="mb-3">一覧画面の「情報を追加」ボタンから、新しい情報を投稿できます。投稿は2パターンあります。</p>
+                            <div class="p-4 bg-gray-50 rounded-lg border">
+                                <h3 class="font-bold text-gray-800">A. 既に登録されている企業への情報追加</h3>
+                                <ol class="list-decimal pl-5 mt-2 space-y-1">
+                                    <li>「業界」ドロップダウンから対象の業界を選択します。</li>
+                                    <li>「企業名」ドロップダウンにその業界の企業が表示されるので、対象の企業を選択します。</li>
+                                    <li>「タイトル」と「内容」を入力します。</li>
+                                    <li>「情報の追加」ボタンをクリックして完了です。</li>
+                                </ol>
+                            </div>
+                            <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <h3 class="font-bold text-gray-800">B. 新しい企業の登録と情報追加</h3>
+                                 <ol class="list-decimal pl-5 mt-2 space-y-1">
+                                    <li>画面下部の青枠内の「業界」から対象の業界を選択します。</li>
+                                    <li>「企業名」欄に、<strong class="text-red-600">正確な企業名</strong>を入力します。</li>
+                                    <li>「タイトル」と「内容」を入力します。</li>
+                                    <li>「情報の追加」ボタンをクリックして完了です。一覧にも新しい企業が追加されます。</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="text-center mt-10">
+                    <button id="backToListBtn" class="btn btn-secondary w-full sm:w-1/2">一覧に戻る</button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- フッター -->
+        <footer>
+            &copy; 2025 QcDa Project. All Rights Reserved.
+        </footer>
+    </div>
+
+    <!-- スクリプト -->
+    <script type="module" src="common.js"></script>
+    <script type="module">
+        import { authGuard, initCommonUI } from './common.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            authGuard('private');
+            initCommonUI();
+            document.getElementById('backToListBtn').addEventListener('click', () => {
+                window.location.href = 'list.html';
+            });
+        });
+    </script>
+</body>
+</html>
