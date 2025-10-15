@@ -47,10 +47,9 @@ const callGasApi = async (action, payload = {}) => {
         const response = await fetch(GAS_API_URL, {
             method: 'POST',
             mode: 'cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8', }, // Use text/plain for GAS POST
+            headers: { 'Content-Type': 'text/plain;charset=utf-8', },
             body: JSON.stringify({ action, payload })
         });
-        // Since GAS web apps can do redirects on POST, we need to handle the response carefully.
         const textResponse = await response.text();
         const result = JSON.parse(textResponse);
 
@@ -66,7 +65,8 @@ export const authGuard = (pageType) => {
     onAuthStateChanged(auth, user => {
         const isAllowed = user && ALLOWED_USERS.includes(user.email);
         if (pageType === 'private' && !isAllowed) {
-            window.location.replace('login.html');
+            // ★★★ 修正箇所: 未認証ユーザーのリダイレクト先をindex.htmlに変更 ★★★
+            window.location.replace('index.html');
         }
         if (pageType === 'public' && isAllowed) {
             window.location.replace('list.html');
@@ -240,3 +240,4 @@ export const handleEntrySubmit = async () => {
         showMessage('entry-message', `登録エラー: ${error.message}`, 'error');
     }
 };
+
