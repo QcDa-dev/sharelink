@@ -8,180 +8,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* 共通スタイル */
-        body {
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
-            background-color: #f9f9f9;
-        }
+        body { font-family: 'Inter', 'Noto+Sans+JP', sans-serif; background-color: #f9f9f9; padding-bottom: 60px; /* フッターの高さ分 */ }
         .hidden { display: none; }
-        .view-container {
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: calc(100vh - 60px); /* フッターの高さを引く */
-        }
-        .content-card {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-        }
+        .view-container { width: 100%; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: calc(100vh - 60px); }
+        .content-card { background-color: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 100%; max-width: 500px; text-align: center; }
         .content-card.max-w-2xl { max-width: 768px; }
         .content-card.max-w-3xl { max-width: 896px; }
-
-        .logo {
-            margin-bottom: 20px;
-            width: 200px;
-            height: auto;
-            max-width: 100%;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .form-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #374151;
-        }
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-            color: #4b5563;
-        }
-        .btn {
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
-            border: none;
-        }
+        .logo { margin-bottom: 20px; width: 200px; height: auto; max-width: 100%; display: block; margin-left: auto; margin-right: auto; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #374151; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 16px; color: #4b5563; }
+        .btn { padding: 12px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background-color 0.3s ease; width: 100%; margin-top: 10px; border: none; }
         .btn-primary { background-color: #4f46e5; color: white; }
         .btn-primary:hover { background-color: #4338ca; }
         .btn-secondary { background-color: #e5e7eb; color: #374151; border: 1px solid #d1d5db; }
         .btn-secondary:hover { background-color: #d1d5db; }
-        
-        /* メッセージ */
-        .message {
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 500;
-        }
+        .message { margin-bottom: 20px; padding: 10px; border-radius: 8px; font-weight: 500; }
         .message.error { background-color: #fee2e2; color: #dc2626; }
         .message.success { background-color: #d1fae5; color: #059669; }
-
-        /* ローディングスピナー */
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 2000;
-        }
-        .spinner {
-            border: 8px solid #f3f3f3; border-top: 8px solid #4f46e5;
-            border-radius: 50%; width: 60px; height: 60px;
-            animation: spin 1s linear infinite;
-        }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #4f46e5; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* ハンバーガーメニュー */
-        #hamburger-icon {
-            position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column;
-            justify-content: space-around; width: 30px; height: 25px;
-            cursor: pointer; z-index: 1003;
-        }
-        #hamburger-icon div {
-            width: 100%; height: 3px; background-color: #374151;
-            border-radius: 2px; transition: all 0.3s ease-in-out;
-        }
-        .sidenav {
-            height: 100%; width: 0; position: fixed; z-index: 1002;
-            top: 0; right: 0; background-color: #ffffff; overflow-x: hidden;
-            transition: 0.5s; padding-top: 60px; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-        }
-        .sidenav a {
-            padding: 10px 15px 10px 32px; text-decoration: none; font-size: 18px;
-            color: #374151; display: block; transition: 0.3s;
-        }
+        #hamburger-icon { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; justify-content: space-around; width: 30px; height: 25px; cursor: pointer; z-index: 1003; }
+        #hamburger-icon div { width: 100%; height: 3px; background-color: #374151; border-radius: 2px; transition: all 0.3s ease-in-out; }
+        .sidenav { height: 100%; width: 0; position: fixed; z-index: 1002; top: 0; right: 0; background-color: #ffffff; overflow-x: hidden; transition: 0.5s; padding-top: 60px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+        .sidenav a { padding: 10px 15px 10px 32px; text-decoration: none; font-size: 18px; color: #374151; display: block; transition: 0.3s; }
         .sidenav a:hover { background-color: #f3f4f6; }
-        .sidenav .version-info {
-            position: absolute; bottom: 20px; padding-left: 32px;
-            font-size: 14px; color: #9ca3af;
-        }
-        #menuOverlay {
-            position: fixed; display: none; width: 100%; height: 100%;
-            top: 0; left: 0; background-color: rgba(0,0,0,0.5);
-            z-index: 1001; cursor: pointer;
-        }
+        .sidenav .version-info { position: absolute; bottom: 20px; padding-left: 32px; font-size: 14px; color: #9ca3af; }
+        #menuOverlay { position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(0,0,0,0.5); z-index: 1001; cursor: pointer; }
         .change .bar1 { transform: rotate(-45deg) translate(-6px, 6px); }
         .change .bar2 { opacity: 0; }
         .change .bar3 { transform: rotate(45deg) translate(-6px, -6px); }
-
-        /* フッター */
-        footer {
-            background-color: #1f2937; color: #e5e7eb; text-align: center;
-            padding: 20px 0; font-size: 0.875rem;
-            position: fixed; bottom: 0; width: 100%;
-        }
-        
-        /* ポップアップ */
-        .popup-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7); display: none;
-            justify-content: center; align-items: center; z-index: 1001;
-        }
-        .popup-content {
-            background: white; padding: 25px; border-radius: 12px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2); max-width: 90%;
-            max-height: 80%; overflow-y: auto; position: relative;
-        }
-        .popup-close-btn {
-            position: absolute; top: 10px; right: 10px; background: #ef4444; color: white;
-            border: none; border-radius: 50%; width: 30px; height: 30px;
-            font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center;
-        }
+        footer { background-color: #1f2937; color: #e5e7eb; text-align: center; padding: 20px 0; font-size: 0.875rem; position: fixed; bottom: 0; width: 100%; }
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 1001; }
+        .popup-content { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2); max-width: 90%; max-height: 80%; overflow-y: auto; position: relative; }
+        .popup-close-btn { position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
-    <!-- ハンバーガーメニュー -->
+    <!-- UI Elements -->
     <div id="hamburger-icon">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
+        <div class="bar1"></div><div class="bar2"></div><div class="bar3"></div>
     </div>
     <div id="sideMenu" class="sidenav">
         <a href="#" id="guideLink">使い方ガイド</a>
         <a href="https://docs.google.com/forms/d/e/1FAIpQLScGBvXYBi2eNcP7SYKieTLoOYJFnyZ9R5FjCGFhGwfvV2oQqA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
         <a href="https://www.notion.so/21de20387ddf8076a938fa17c25257f4" target="_blank" rel="noopener noreferrer">リリースノート</a>
         <a href="https://qcda-dev.github.io/HP/" target="_blank" rel="noopener noreferrer">QcDa Projectとは</a>
-        <div class="version-info">ver 2.0.0</div>
+        <div class="version-info">ver 3.0.0</div>
     </div>
     <div id="menuOverlay"></div>
+    <div id="loading-overlay" class="loading-overlay hidden"><div class="spinner"></div></div>
 
-    <!-- ローディング表示 -->
-    <div id="loading-overlay" class="loading-overlay hidden">
-        <div class="spinner"></div>
-    </div>
-    
-    <!-- ===== 各画面のコンテナ ===== -->
-    
-    <!-- ログイン画面 -->
+    <!-- Views -->
     <div id="login-view" class="view-container">
         <div class="content-card">
             <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
@@ -192,15 +71,12 @@
         </div>
     </div>
 
-    <!-- 企業情報一覧画面 -->
     <div id="list-view" class="view-container hidden">
         <div class="content-card max-w-3xl">
             <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">企業情報一覧</h2>
             <div id="list-message" class="message hidden"></div>
-            <div id="documentContent" class="text-left p-4 border border-gray-200 rounded-lg bg-gray-50 overflow-y-auto max-h-[60vh]">
-                <p class="text-gray-500">情報を読み込んでいます...</p>
-            </div>
+            <div id="documentContent" class="text-left p-4 border border-gray-200 rounded-lg bg-gray-50 overflow-y-auto max-h-[60vh]"></div>
             <div class="flex flex-col sm:flex-row justify-center mt-6 gap-4">
                 <button id="addInfoBtn" class="btn btn-primary">情報を追加</button>
                 <button id="logoutBtn" class="btn btn-secondary">ログアウト</button>
@@ -208,41 +84,22 @@
         </div>
     </div>
     
-    <!-- 情報記録画面 -->
     <div id="entry-view" class="view-container hidden">
-        <div class="content-card max-w-2xl">
+         <div class="content-card max-w-2xl">
             <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">情報記録</h2>
             <p class="text-left mb-4">日時やイベント名などがわかるときは、タイトルに必ず書くようにしてください！</p>
             <div id="entry-message" class="message hidden"></div>
             <form id="recordForm">
-                <div class="form-group">
-                    <label for="industrySelect">業界</label>
-                    <select name="industryName" id="industrySelect" class="form-input"><option value="">----</option></select>
-                </div>
-                <div class="form-group">
-                    <label for="companySelect">企業名</label>
-                    <select name="companyName" id="companySelect" class="form-input"><option value="">----</option></select>
-                </div>
+                <div class="form-group"><label for="industrySelect">業界</label><select name="industryName" id="industrySelect" class="form-input"></select></div>
+                <div class="form-group"><label for="companySelect">企業名</label><select name="companyName" id="companySelect" class="form-input"></select></div>
                 <div class="mt-8 p-4 border border-blue-200 rounded-lg bg-blue-50">
                     <p class="text-blue-700 mb-2 text-sm text-left">新しい企業を登録したい場合は、こちらに企業名を正確に記入してください。また、業界を選択してください。</p>
-                    <div class="form-group">
-                        <label for="newIndustrySelect">業界</label>
-                        <select name="newIndustryName" id="newIndustrySelect" class="form-input"><option value="">----</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="newCompanyName">企業名</label>
-                        <input type="text" name="newCompanyName" id="newCompanyName" placeholder="新しい企業名を入力" class="form-input">
-                    </div>
+                    <div class="form-group"><label for="newIndustrySelect">業界</label><select name="newIndustryName" id="newIndustrySelect" class="form-input"></select></div>
+                    <div class="form-group"><label for="newCompanyName">企業名</label><input type="text" name="newCompanyName" id="newCompanyName" placeholder="新しい企業名を入力" class="form-input"></div>
                 </div>
-                <div class="form-group mt-6">
-                    <label for="title">タイトル</label>
-                    <input type="text" name="title" id="title" placeholder="タイトルを入力" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="contents">内容</label>
-                    <textarea name="contents" id="contents" rows="10" placeholder="内容を入力" class="form-input"></textarea>
-                </div>
+                <div class="form-group mt-6"><label for="title">タイトル</label><input type="text" name="title" id="title" placeholder="タイトルを入力" class="form-input" required></div>
+                <div class="form-group"><label for="contents">内容</label><textarea name="contents" id="contents" rows="10" placeholder="内容を入力" class="form-input"></textarea></div>
                 <div class="flex flex-col sm:flex-row justify-between mt-6 space-y-3 sm:space-y-0 sm:space-x-4">
                     <button type="button" id="backToListBtn" class="btn btn-secondary">戻る</button>
                     <button type="button" id="submitBtn" class="btn btn-primary">情報の追加</button>
@@ -251,9 +108,8 @@
         </div>
     </div>
     
-    <!-- 使い方ガイド画面 -->
     <div id="guide-view" class="view-container hidden">
-        <div class="content-card max-w-3xl text-left">
+         <div class="content-card max-w-3xl text-left">
             <h1 class="text-2xl font-bold mb-4 text-center">使い方ガイド</h1>
             <section class="mb-6">
                 <h2 class="text-xl font-semibold border-b-2 border-blue-500 pb-2 mb-3">アプリ概要</h2>
@@ -269,12 +125,11 @@
             </section>
             <section class="mb-6">
                 <h2 class="text-xl font-semibold border-b-2 border-blue-500 pb-2 mb-3">情報の追加方法</h2>
-                <p class="mb-2">皆さんが持っている情報をどしどし投稿してください！</p>
                 <div class="pl-4">
                     <h3 class="font-bold mt-2">＜既に登録されている企業の場合＞</h3>
                     <ol class="list-decimal pl-5 space-y-1">
                         <li>業界と企業名を選んでください。</li>
-                        <li>タイトルと内容を入力してください（日時やイベント名などがわかるときは、タイトルに必ず書いてください）。</li>
+                        <li>タイトルと内容を入力してください。</li>
                         <li>最後に、”情報の追加”ボタンをクリック！</li>
                     </ol>
                     <h3 class="font-bold mt-4">＜新しい企業の場合＞</h3>
@@ -286,61 +141,39 @@
                     </ol>
                 </div>
             </section>
-            <div class="text-center mt-8">
-                <button id="backFromGuideBtn" class="btn btn-secondary w-1/2">戻る</button>
-            </div>
+            <div class="text-center mt-8"><button id="backFromGuideBtn" class="btn btn-secondary w-1/2">戻る</button></div>
         </div>
     </div>
 
-    <!-- ポップアップ -->
     <div id="popupOverlay" class="popup-overlay">
-        <div id="popupContent" class="popup-content">
-            <button id="popupCloseBtn" class="popup-close-btn">×</button>
-            <h3 id="popupTitle" class="text-xl font-bold mb-4 text-gray-800"></h3>
-            <div id="popupBody" class="text-left max-h-[60vh] overflow-y-auto"></div>
-        </div>
+        <div class="popup-content"><button id="popupCloseBtn" class="popup-close-btn">×</button><div id="popupBody" class="text-left max-h-[60vh] overflow-y-auto"></div></div>
     </div>
 
-
-    <!-- フッター -->
-    <footer>
-        &copy; 2025 QcDa Project. All Rights Reserved.
-    </footer>
+    <footer>&copy; 2025 QcDa Project. All Rights Reserved.</footer>
 
     <!-- Firebase SDKs -->
     <script type="module">
-        // Firebase SDKのインポート
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-        // ===============================================================
-        // TODO: ここにあなたのFirebaseプロジェクトの設定を貼り付けてください
-        // ===============================================================
+        // --- Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyCLFF_G7J0jcZ5UOXkKaaI4dzYWGQYwfMk",
             authDomain: "share-link-app-7c054.firebaseapp.com",
             projectId: "share-link-app-7c054",
-            storageBucket: "share-link-app-7c054.firebasestorage.app",
+            storageBucket: "share-link-app-7c054.appspot.com",
             messagingSenderId: "798642318617",
-            appId: "1:798642318617:web:fb6a11384f56a93d6ae988",
-        	measurementId: "G-H9PVC2J9RE"
+            appId: "1:798642318617:web:fb6a11384f56a93d6ae988"
         };
+        const ALLOWED_USERS = ['qcda.app@gmail.com', 'akihumikoiwa1162@gmail.com'];
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxK1vKRm9D-oWlkOkmLsrEeNf9vse6R6qmQpE_TJpsTWZjHepBX6yheNQ3t-CMGT4sG/exec";
+        const DOC_ID_FOR_LIST = '1GFx3yl_M6ljmZhgBTS5PGhOtYpe_Umwl9myEfLNHMyo';
         
-        // ===============================================================
-        // TODO: ここにアクセスを許可するGoogleアカウントのメールアドレスを記載してください
-        // ===============================================================
-        const ALLOWED_USERS = [
-            'qcda.app@gmail.com',
-            'akihumikoiwa1162@gmail.com'
-        ];
-
-        // Firebaseの初期化
+        // --- Firebase Initialization ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
 
-        // DOM要素の取得
+        // --- DOM Elements ---
         const loadingOverlay = document.getElementById('loading-overlay');
         const views = {
             login: document.getElementById('login-view'),
@@ -348,288 +181,210 @@
             entry: document.getElementById('entry-view'),
             guide: document.getElementById('guide-view'),
         };
-        
-        // ===============================================================
-        // 画面表示・UI制御
-        // ===============================================================
-        
-        // 指定された画面を表示し、他を非表示にする
+
+        // --- UI Control ---
         const showView = (viewName) => {
             Object.values(views).forEach(view => view.classList.add('hidden'));
-            if (views[viewName]) {
-                views[viewName].classList.remove('hidden');
-            }
+            if (views[viewName]) views[viewName].classList.remove('hidden');
         };
-        
-        // ローディング表示/非表示
         const showLoading = () => loadingOverlay.classList.remove('hidden');
         const hideLoading = () => loadingOverlay.classList.add('hidden');
-
-        // メッセージ表示
         const showMessage = (elementId, message, type) => {
             const el = document.getElementById(elementId);
             if (!el) return;
             el.textContent = message;
             el.className = 'message';
             el.classList.add(type);
+            el.classList.remove('hidden');
             setTimeout(() => el.classList.add('hidden'), 5000);
         };
-        
-        // ハンバーガーメニュー制御
-        const hamburger = document.getElementById('hamburger-icon');
-        const sideMenu = document.getElementById('sideMenu');
-        const menuOverlay = document.getElementById('menuOverlay');
         const toggleMenu = () => {
+            const hamburger = document.getElementById('hamburger-icon');
+            const sideMenu = document.getElementById('sideMenu');
+            const menuOverlay = document.getElementById('menuOverlay');
             hamburger.classList.toggle("change");
             const isOpen = sideMenu.style.width === "250px";
             sideMenu.style.width = isOpen ? "0" : "250px";
             menuOverlay.style.display = isOpen ? "none" : "block";
         };
-        hamburger.addEventListener('click', toggleMenu);
-        menuOverlay.addEventListener('click', toggleMenu);
-
-
-        // ===============================================================
-        // 認証ロジック
-        // ===============================================================
         
-        // Googleログイン
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            const provider = new GoogleAuthProvider();
-            signInWithPopup(auth, provider).catch(error => {
-                console.error("Login failed:", error);
-                showMessage('login-message', `ログインに失敗しました: ${error.message}`, 'error');
-            });
-        });
+        // --- API Call Helper ---
+        const callGasApi = async (action, payload = {}) => {
+            showLoading();
+            try {
+                const response = await fetch(GAS_API_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    redirect: 'follow',
+                    body: JSON.stringify({ action, payload })
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const result = await response.json();
+                if(result.status === 'error') throw new Error(result.message);
+                return result.data;
+            } finally {
+                hideLoading();
+            }
+        };
 
-        // ログアウト
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            signOut(auth).catch(error => console.error("Logout failed:", error));
-        });
-
-        // 認証状態の監視
+        // --- Authentication ---
         onAuthStateChanged(auth, user => {
-            if (user) {
-                if (ALLOWED_USERS.includes(user.email)) {
-                    showView('list');
-                    fetchAndRenderCompanies();
-                } else {
-                    showMessage('login-message', 'このアカウントでのアクセスは許可されていません。', 'error');
-                    signOut(auth);
-                }
+            if (user && ALLOWED_USERS.includes(user.email)) {
+                showView('list');
+                fetchAndRenderList();
             } else {
+                if (user) signOut(auth);
                 showView('login');
             }
         });
+        document.getElementById('loginBtn').addEventListener('click', () => signInWithPopup(auth, new GoogleAuthProvider()));
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-        // ===============================================================
-        // Firestoreデータ操作 & 描画ロジック (一覧画面)
-        // ===============================================================
-        let allCompaniesData = []; // 企業データをキャッシュ
-
-        const fetchAndRenderCompanies = async () => {
-            showLoading();
+        // --- List View Logic ---
+        const fetchAndRenderList = async () => {
+            const docContentDiv = document.getElementById('documentContent');
+            docContentDiv.innerHTML = '<p class="text-gray-500">ドキュメントを読み込み中...</p>';
             try {
-                const querySnapshot = await getDocs(collection(db, "companies"));
-                allCompaniesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                // 業界でグループ化
-                const companiesByIndustry = allCompaniesData.reduce((acc, company) => {
-                    const { industry } = company;
-                    if (!acc[industry]) acc[industry] = [];
-                    acc[industry].push(company);
-                    return acc;
-                }, {});
-
-                const contentDiv = document.getElementById('documentContent');
-                contentDiv.innerHTML = '';
-
-                // 業界順にソートして表示
-                Object.keys(companiesByIndustry).sort().forEach(industry => {
-                    const industryHeader = document.createElement('h3');
-                    industryHeader.className = 'text-lg font-bold mt-4 text-gray-700';
-                    industryHeader.textContent = industry;
-                    contentDiv.appendChild(industryHeader);
-
-                    const companyList = document.createElement('ul');
-                    companyList.className = 'pl-4';
-                    
-                    // 企業名でソート
-                    companiesByIndustry[industry].sort((a, b) => a.companyName.localeCompare(b.companyName, 'ja')).forEach(company => {
-                        const li = document.createElement('li');
-                        const link = document.createElement('a');
-                        link.href = '#';
-                        link.className = 'text-blue-600 hover:underline';
-                        link.textContent = company.companyName;
-                        link.dataset.companyId = company.id;
-                        link.addEventListener('click', handleCompanyLinkClick);
-                        li.appendChild(link);
-                        companyList.appendChild(li);
-                    });
-                    contentDiv.appendChild(companyList);
-                });
+                const contentElements = await callGasApi('getGoogleDocContent', { docId: DOC_ID_FOR_LIST });
+                renderDocumentContent(docContentDiv, contentElements, true);
             } catch (error) {
-                console.error("Error fetching companies: ", error);
-                showMessage('list-message', '企業情報の取得に失敗しました。', 'error');
-            } finally {
-                hideLoading();
+                showMessage('list-message', `一覧の読み込みに失敗しました: ${error.message}`, 'error');
             }
         };
 
-        const handleCompanyLinkClick = async (e) => {
-            e.preventDefault();
-            const companyId = e.target.dataset.companyId;
-            showLoading();
-            try {
-                const docRef = doc(db, "companies", companyId);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const companyData = docSnap.data();
-                    document.getElementById('popupTitle').textContent = companyData.companyName;
-                    const popupBody = document.getElementById('popupBody');
-                    popupBody.innerHTML = '';
-                    if (companyData.records && companyData.records.length > 0) {
-                        companyData.records.forEach(record => {
-                            const recordDiv = document.createElement('div');
-                            recordDiv.className = 'mb-4 pb-4 border-b last:border-b-0';
-                            
-                            const titleEl = document.createElement('h4');
-                            titleEl.className = 'font-bold text-md text-gray-800';
-                            titleEl.textContent = record.title;
-
-                            const userEl = document.createElement('p');
-                            userEl.className = 'text-sm text-gray-500 mb-2';
-                            userEl.textContent = `投稿者: ${record.userId}`;
-
-                            const contentEl = document.createElement('p');
-                            contentEl.className = 'text-gray-700 whitespace-pre-wrap';
-                            contentEl.textContent = record.contents;
-                            
-                            recordDiv.append(titleEl, userEl, contentEl);
-                            popupBody.appendChild(recordDiv);
-                        });
-                    } else {
-                        popupBody.textContent = 'まだ投稿がありません。';
-                    }
-                    document.getElementById('popupOverlay').style.display = 'flex';
-                } else {
-                    showMessage('list-message', '企業の詳細情報の取得に失敗しました。', 'error');
+        const renderDocumentContent = (container, contentElements, isMainList) => {
+            container.innerHTML = '';
+            contentElements.forEach(element => {
+                if (element.paragraph) {
+                    const p = document.createElement('p');
+                    element.paragraph.elements.forEach(run => {
+                        if (run.textRun) {
+                            let textNode;
+                            const textStyle = run.textRun.textStyle;
+                            if (textStyle && textStyle.link) {
+                                textNode = document.createElement('a');
+                                textNode.href = textStyle.link.url;
+                                textNode.className = 'text-blue-600 hover:underline';
+                                if (isMainList) {
+                                    textNode.addEventListener('click', handleDocLinkClick);
+                                } else {
+                                    textNode.target = '_blank';
+                                    textNode.rel = 'noopener noreferrer';
+                                }
+                            } else {
+                                textNode = document.createElement('span');
+                            }
+                            textNode.textContent = run.textRun.content;
+                            if (textStyle) {
+                                if (textStyle.bold) textNode.style.fontWeight = 'bold';
+                                if (textStyle.italic) textNode.style.fontStyle = 'italic';
+                                if (textStyle.underline) textNode.style.textDecoration = 'underline';
+                            }
+                            p.appendChild(textNode);
+                        }
+                    });
+                    container.appendChild(p);
                 }
-            } catch(error) {
-                console.error("Error fetching company details:", error);
-                showMessage('list-message', 'エラーが発生しました。', 'error');
-            } finally {
-                hideLoading();
-            }
-        };
-
-        document.getElementById('popupCloseBtn').addEventListener('click', () => {
-            document.getElementById('popupOverlay').style.display = 'none';
-        });
-
-        // ===============================================================
-        // Firestoreデータ操作 & 描画ロジック (情報記録画面)
-        // ===============================================================
-        
-        const setupEntryForm = () => {
-            const industries = [...new Set(allCompaniesData.map(c => c.industry))].sort();
-            const industrySelect = document.getElementById('industrySelect');
-            const newIndustrySelect = document.getElementById('newIndustrySelect');
-            industrySelect.innerHTML = '<option value="">----</option>';
-            newIndustrySelect.innerHTML = '<option value="">----</option>';
-            industries.forEach(ind => {
-                industrySelect.innerHTML += `<option value="${ind}">${ind}</option>`;
-                newIndustrySelect.innerHTML += `<option value="${ind}">${ind}</option>`;
             });
         };
-        
-        document.getElementById('industrySelect').addEventListener('change', (e) => {
-            const selectedIndustry = e.target.value;
-            const companySelect = document.getElementById('companySelect');
-            companySelect.innerHTML = '<option value="">----</option>';
-            if (selectedIndustry) {
-                const companiesInIndustry = allCompaniesData
-                    .filter(c => c.industry === selectedIndustry)
-                    .sort((a,b) => a.companyName.localeCompare(b.companyName, 'ja'));
-                companiesInIndustry.forEach(comp => {
-                    companySelect.innerHTML += `<option value="${comp.id}">${comp.companyName}</option>`;
+
+        const handleDocLinkClick = async (event) => {
+            event.preventDefault();
+            const url = event.target.href;
+            const match = url.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) {
+                const linkedDocId = match[1];
+                try {
+                    const content = await callGasApi('getGoogleDocContent', { docId: linkedDocId });
+                    renderDocumentContent(document.getElementById('popupBody'), content, false);
+                    document.getElementById('popupOverlay').style.display = 'flex';
+                } catch (error) {
+                    showMessage('list-message', `リンク先の読み込みに失敗: ${error.message}`, 'error');
+                }
+            } else {
+                window.open(url, '_blank');
+            }
+        };
+
+        // --- Entry View Logic ---
+        const populateDropdown = (selectElement, options) => {
+            selectElement.innerHTML = '<option value="">----</option>';
+            if (options && Array.isArray(options)) {
+                options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    selectElement.appendChild(opt);
                 });
+            }
+        };
+
+        const setupEntryForm = async () => {
+            try {
+                const { tags, newTags } = await callGasApi('getTagsForEntry');
+                populateDropdown(document.getElementById('industrySelect'), tags);
+                populateDropdown(document.getElementById('newIndustrySelect'), newTags);
+            } catch (error) {
+                showMessage('entry-message', `業界リストの取得に失敗: ${error.message}`, 'error');
+            }
+        };
+
+        document.getElementById('industrySelect').addEventListener('change', async (e) => {
+            const industryName = e.target.value;
+            const companySelect = document.getElementById('companySelect');
+            if (!industryName) {
+                populateDropdown(companySelect, []);
+                return;
+            }
+            try {
+                const companies = await callGasApi('getCompaniesByIndustry', { industryName });
+                populateDropdown(companySelect, companies);
+            } catch (error) {
+                 showMessage('entry-message', `企業リストの取得に失敗: ${error.message}`, 'error');
             }
         });
 
         document.getElementById('submitBtn').addEventListener('click', async () => {
             const form = document.getElementById('recordForm');
-            const newRecord = {
+            const formData = {
+                industryName: form.industryName.value,
+                companyName: form.companyName.value,
+                newIndustryName: form.newIndustryName.value,
+                newCompanyName: form.newCompanyName.value.trim(),
                 title: form.title.value.trim(),
                 contents: form.contents.value.trim(),
                 userId: auth.currentUser.email,
-                createdAt: new Date()
             };
 
-            if (!newRecord.title) {
-                showMessage('entry-message', 'タイトルを入力してください。', 'error');
-                return;
+            if (!formData.title) {
+                return showMessage('entry-message', 'タイトルは必須です。', 'error');
             }
-
-            showLoading();
+            if (!formData.companyName && !formData.newCompanyName) {
+                return showMessage('entry-message', '既存の企業か新しい企業を選択・入力してください。', 'error');
+            }
             
             try {
-                const selectedCompanyId = form.companyName.value;
-                const newCompanyName = form.newCompanyName.value.trim();
-                const newIndustryName = form.newIndustryName.value;
-
-                // --- 既存企業への追加 ---
-                if (selectedCompanyId) {
-                    const companyRef = doc(db, "companies", selectedCompanyId);
-                    await updateDoc(companyRef, {
-                        records: arrayUnion(newRecord)
-                    });
-                    showMessage('entry-message', '情報の追加が完了しました。', 'success');
-                } 
-                // --- 新規企業として追加 ---
-                else if (newCompanyName && newIndustryName) {
-                    const newCompanyRef = doc(collection(db, "companies"));
-                    await setDoc(newCompanyRef, {
-                        companyName: newCompanyName,
-                        industry: newIndustryName,
-                        records: [newRecord]
-                    });
-                    showMessage('entry-message', '新しい企業として情報が追加されました。', 'success');
-                    await fetchAndRenderCompanies(); // 新規企業追加後に一覧を更新
-                } 
-                // --- 入力不備 ---
-                else {
-                    showMessage('entry-message', '既存の企業を選択するか、新しい企業情報をすべて入力してください。', 'error');
-                    return;
-                }
-                
+                const response = await callGasApi('addRecord', formData);
+                showMessage('entry-message', response.message, 'success');
                 form.reset();
-                document.getElementById('companySelect').innerHTML = '<option value="">----</option>';
-                
+                populateDropdown(document.getElementById('companySelect'), []);
+                // Refresh list data in background
+                fetchAndRenderList();
             } catch (error) {
-                console.error("Error adding record: ", error);
-                showMessage('entry-message', '情報の追加中にエラーが発生しました。', 'error');
-            } finally {
-                hideLoading();
+                showMessage('entry-message', `登録エラー: ${error.message}`, 'error');
             }
         });
-
-
-        // ===============================================================
-        // 画面遷移ボタンのイベントリスナー
-        // ===============================================================
-        document.getElementById('addInfoBtn').addEventListener('click', () => {
-            setupEntryForm();
-            showView('entry');
-        });
+        
+        // --- Event Listeners ---
+        document.getElementById('hamburger-icon').addEventListener('click', toggleMenu);
+        document.getElementById('menuOverlay').addEventListener('click', toggleMenu);
+        document.getElementById('popupCloseBtn').addEventListener('click', () => { document.getElementById('popupOverlay').style.display = 'none'; });
+        document.getElementById('addInfoBtn').addEventListener('click', () => { showView('entry'); setupEntryForm(); });
         document.getElementById('backToListBtn').addEventListener('click', () => showView('list'));
-        document.getElementById('guideLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            showView('guide');
-            toggleMenu();
-        });
+        document.getElementById('guideLink').addEventListener('click', (e) => { e.preventDefault(); showView('guide'); toggleMenu(); });
         document.getElementById('backFromGuideBtn').addEventListener('click', () => showView('list'));
+
     </script>
 </body>
 </html>
+
