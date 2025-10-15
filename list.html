@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企業情報一覧 | 就活しぇありんく</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- ハンバーガーメニューなど共通UI -->
+        <div id="common-ui-container"></div>
+        
+        <!-- メインコンテンツ -->
+        <main class="view-container">
+            <div class="content-card max-w-3xl">
+                <img src="https://lh3.googleusercontent.com/d/1aeSD5Nt-uXmRBjVra2jzXFO6gRLLjLDv" alt="ロゴ" class="logo">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">企業情報一覧</h2>
+                <div id="list-message" class="message hidden"></div>
+                <div id="documentContent" class="text-left p-4 border border-gray-200 rounded-lg bg-gray-50 overflow-y-auto max-h-[60vh]">
+                    <p class="text-gray-500">ドキュメントを読み込み中...</p>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-center mt-6 gap-4">
+                    <button id="addInfoBtn" class="btn btn-primary">情報を追加</button>
+                    <button id="logoutBtn" class="btn btn-secondary">ログアウト</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- ポップアップ -->
+        <div id="popupOverlay" class="popup-overlay">
+            <div class="popup-content">
+                <button id="popupCloseBtn" class="popup-close-btn">×</button>
+                <div id="popupBody" class="text-left max-h-[60vh] overflow-y-auto"></div>
+            </div>
+        </div>
+        
+        <!-- フッター -->
+        <footer>
+            &copy; 2025 QcDa Project. All Rights Reserved.
+        </footer>
+    </div>
+    
+    <!-- スクリプト -->
+    <script type="module" src="common.js"></script>
+    <script type="module">
+        import { authGuard, initCommonUI, handleLogout, fetchAndRenderList, handleDocLinkClick } from './common.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            authGuard('private');
+            initCommonUI();
+            fetchAndRenderList();
+
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            document.getElementById('addInfoBtn').addEventListener('click', () => {
+                window.location.href = 'entry.html';
+            });
+            document.getElementById('popupCloseBtn').addEventListener('click', () => {
+                document.getElementById('popupOverlay').style.display = 'none';
+            });
+            // イベント委譲でリンククリックを処理
+            document.getElementById('documentContent').addEventListener('click', (e) => {
+                if(e.target.tagName === 'A' && e.target.href.includes('docs.google.com')) {
+                    handleDocLinkClick(e);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
