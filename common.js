@@ -176,7 +176,7 @@ const renderDocumentContent = (container, contentElements, isMainList) => {
 export const handleDocLinkClick = async (event) => {
     event.preventDefault();
     const url = event.target.href;
-    const match = url.match(/docs\.google\.com\/document\/d\/([a-zA-Z0--9_-]+)/);
+    const match = url.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
     if (match && match[1]) {
         const linkedDocId = match[1];
         try {
@@ -261,4 +261,5 @@ export const handleEntrySubmit = async () => {
         showMessage('entry-message', `登録エラー: ${error.message}`, 'error');
     }
 };
+
 
