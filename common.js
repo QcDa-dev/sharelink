@@ -65,7 +65,6 @@ export const authGuard = (pageType) => {
     onAuthStateChanged(auth, user => {
         const isAllowed = user && ALLOWED_USERS.includes(user.email);
         if (pageType === 'private' && !isAllowed) {
-            // ★★★ 修正箇所: 未認証ユーザーのリダイレクト先をindex.htmlに変更 ★★★
             window.location.replace('index.html');
         }
         if (pageType === 'public' && isAllowed) {
@@ -80,6 +79,7 @@ export const handleLogout = () => signOut(auth);
 export const initCommonUI = () => {
     const container = document.getElementById('common-ui-container');
     if (!container) return;
+    // ★★★ 修正箇所: 「QcDa Projectとは」のリンクをdivで囲み、クラスを付与 ★★★
     container.innerHTML = `
         <div id="hamburger-icon">
             <div class="bar1"></div><div class="bar2"></div><div class="bar3"></div>
@@ -89,7 +89,11 @@ export const initCommonUI = () => {
             <a href="guide.html">使い方ガイド</a>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLScGBvXYBi2eNcP7SYKieTLoOYJFnyZ9R5FjCGFhGwfvV2oQqA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer">お問い合わせ</a>
             <a href="https://www.notion.so/21de20387ddf8076a938fa17c25257f4" target="_blank" rel="noopener noreferrer">リリースノート</a>
-            <a href="https://qcda-dev.github.io/HP/" target="_blank" rel="noopener noreferrer">QcDa Projectとは</a>
+            
+            <div class="menu-separator">
+                <a href="https://qcda-dev.github.io/HP/" target="_blank" rel="noopener noreferrer">QcDa Projectとは</a>
+            </div>
+
             <div class="version-info">ver 3.0.0</div>
         </div>
         <div id="menuOverlay"></div>
@@ -120,7 +124,6 @@ export const fetchAndRenderList = async () => {
 
 const renderDocumentContent = (container, contentElements, isMainList) => {
     container.innerHTML = '';
-    // ★★★ 修正箇所: 業界見出しのリストを追加 ★★★
     const industryHeadings = [
         "官公庁・公社・団体", "メーカー", "商社", "流通・小売", "金融", 
         "サービス・インフラ", "ソフトウェア・通信", "広告・出版・マスコミ"
@@ -135,9 +138,8 @@ const renderDocumentContent = (container, contentElements, isMainList) => {
               }
             });
 
-            // ★★★ 修正箇所: 業界見出しであれば、その前に改行(<br>)を挿入 ★★★
             if (industryHeadings.includes(paragraphText.trim())) {
-                if (container.children.length > 0) { // 先頭には挿入しない
+                if (container.children.length > 0) {
                     container.appendChild(document.createElement('br'));
                 }
             }
@@ -176,6 +178,7 @@ const renderDocumentContent = (container, contentElements, isMainList) => {
 export const handleDocLinkClick = async (event) => {
     event.preventDefault();
     const url = event.target.href;
+    // ★★★ 前回のバグ修正を適用 ★★★
     const match = url.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
     if (match && match[1]) {
         const linkedDocId = match[1];
@@ -261,5 +264,4 @@ export const handleEntrySubmit = async () => {
         showMessage('entry-message', `登録エラー: ${error.message}`, 'error');
     }
 };
-
 
