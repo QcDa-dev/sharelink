@@ -120,8 +120,28 @@ export const fetchAndRenderList = async () => {
 
 const renderDocumentContent = (container, contentElements, isMainList) => {
     container.innerHTML = '';
+    // ★★★ 修正箇所: 業界見出しのリストを追加 ★★★
+    const industryHeadings = [
+        "官公庁・公社・団体", "メーカー", "商社", "流通・小売", "金融", 
+        "サービス・インフラ", "ソフトウェア・通信", "広告・出版・マスコミ"
+    ];
+
     contentElements.forEach(element => {
         if (element.paragraph) {
+            let paragraphText = '';
+            element.paragraph.elements.forEach(run => {
+              if (run.textRun) {
+                paragraphText += run.textRun.content;
+              }
+            });
+
+            // ★★★ 修正箇所: 業界見出しであれば、その前に改行(<br>)を挿入 ★★★
+            if (industryHeadings.includes(paragraphText.trim())) {
+                if (container.children.length > 0) { // 先頭には挿入しない
+                    container.appendChild(document.createElement('br'));
+                }
+            }
+
             const p = document.createElement('p');
             element.paragraph.elements.forEach(run => {
                 if (run.textRun) {
@@ -152,10 +172,11 @@ const renderDocumentContent = (container, contentElements, isMainList) => {
     });
 };
 
+
 export const handleDocLinkClick = async (event) => {
     event.preventDefault();
     const url = event.target.href;
-    const match = url.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
+    const match = url.match(/docs\.google\.com\/document\/d\/([a-zA-Z0--9_-]+)/);
     if (match && match[1]) {
         const linkedDocId = match[1];
         try {
