@@ -10,7 +10,7 @@ const firebaseConfig = {
     messagingSenderId: "798642318617",
     appId: "1:798642318617:web:fb6a11384f56a93d6ae988"
 };
-const ALLOWED_USERS = ['qcda.app@gmail.com', 'akihumikoiwa1162@gmail.com', 'yongxiwu73@gmail.com'];
+const ALLOWED_USERS = ['qcda.app@gmail.com', 'akihumikoiwa1162@gmail.com', 'yongxiwu73@gmail.com', '1162koiwa@gmail.com'];
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxK1vKRm9D-oWlkOkmLsrEeNf9vse6R6qmQpE_TJpsTWZjHepBX6yheNQ3t-CMGT4sG/exec";
 const DOC_ID_FOR_LIST = '1GFx3yl_M6ljmZhgBTS5PGhOtYpe_Umwl9myEfLNHMyo';
 
